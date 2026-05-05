@@ -216,7 +216,7 @@ export async function generateDocx(
     : [];
 
   const doc = new Document({
-    creator: "AutoScriptorX",
+    creator: "KlaroScriptorX",
     title: parsed.title,
     styles: {
       default: { document: { run: { font, size: bodySize } } },

@@ -29,16 +29,21 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AutoScriptorX" },
-      { name: "description", content: "AutoScriptorX — Advanced Manuscript Processing" },
-      { name: "author", content: "AutoScriptorX" },
-      { property: "og:title", content: "AutoScriptorX" },
-      { property: "og:description", content: "AutoScriptorX — Advanced Manuscript Processing" },
+      { title: "KlaroScriptorX" },
+      { name: "description", content: "KlaroScriptorX — Advanced Manuscript Processing" },
+      { name: "author", content: "KlaroScriptorX" },
+      { property: "og:title", content: "KlaroScriptorX" },
+      { property: "og:description", content: "KlaroScriptorX — Advanced Manuscript Processing" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@AutoScriptorX" },
+      { name: "twitter:site", content: "@KlaroScriptorX" },
     ],
     links: [
+      {
+        rel: "icon",
+        type: "image/png",
+        href: "/logo_transparent_v4.png?v=4",
+      },
       {
         rel: "stylesheet",
         href: appCss,

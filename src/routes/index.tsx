@@ -1,23 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { ManuscriptStudio } from "@/components/ManuscriptStudio";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "AutoScriptorX — Format academic manuscripts in seconds" },
+      { title: "KlaroScriptorX" },
       {
         name: "description",
         content:
           "Upload an unstructured DOCX manuscript and instantly map it to IEEE, Springer LNCS, or APA templates. Export polished DOCX and PDF files.",
       },
-      { property: "og:title", content: "AutoScriptorX — Manuscript formatting, automated" },
+      { property: "og:title", content: "KlaroScriptorX" },
       {
         property: "og:description",
         content: "Turn raw academic drafts into publication-ready papers in seconds.",
       },
     ],
     links: [
+      { rel: "icon", type: "image/png", href: "/logo_transparent_v4.png?v=4" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap",
@@ -30,14 +32,13 @@ function Index() {
   return (
     <main className="min-h-screen">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-          </div>
-          <span className="font-display text-xl font-semibold">AutoScriptorX</span>
+        <div className="flex items-center gap-3">
+          <img 
+            src="/logo_transparent_v4.png?v=4" 
+            className="h-10 w-10 object-contain" 
+            alt="KlaroScriptorX Logo" 
+          />
+          <span className="font-display text-xl font-semibold">KlaroScriptorX</span>
         </div>
         <a href="#studio" className="text-sm text-muted-foreground hover:text-foreground">
           Open studio →
@@ -52,7 +53,7 @@ function Index() {
           From rough draft to <em className="text-accent not-italic">publication-ready</em> in one upload.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-          AutoScriptorX reads unstructured DOCX manuscripts, identifies every section, table, figure, and reference,
+          KlaroScriptorX reads unstructured DOCX manuscripts, identifies every section, table, figure, and reference,
           then formats them to your chosen journal or conference template.
         </p>
       </header>
@@ -78,17 +79,22 @@ function Index() {
               d: "Generate a clean .docx for further editing and a print-ready .pdf with proper headers and pagination.",
             },
           ].map((f) => (
-            <div key={f.n} className="rounded-xl border border-rule bg-card p-6">
-              <p className="font-mono text-xs text-accent">{f.n}</p>
+            <motion.div 
+              key={f.n} 
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="group cursor-default rounded-xl border border-rule bg-card p-6 shadow-sm transition-colors hover:border-accent/30 hover:bg-accent/[0.02]"
+            >
+              <p className="font-mono text-xs text-accent transition-transform group-hover:scale-110 origin-left">{f.n}</p>
               <h3 className="mt-2 font-display text-xl">{f.t}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{f.d}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
       <footer className="border-t border-rule py-8 text-center text-xs text-muted-foreground">
-        AutoScriptorX · Built for researchers who'd rather write than format.
+        KlaroScriptorX · Built for researchers who'd rather write than format.
       </footer>
     </main>
   );

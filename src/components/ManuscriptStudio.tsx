@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { saveAs } from "file-saver";
 import { parseDocx, type ParsedDoc } from "@/lib/docParser";
@@ -18,6 +18,15 @@ export function ManuscriptStudio() {
   const [fontSize, setFontSize] = useState("12");
   const [fontFamily, setFontFamily] = useState("Times New Roman");
   const [hasBorders, setHasBorders] = useState(false);
+  
+  useEffect(() => {
+    if (stage === "ready") {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => { document.body.style.overflow = "auto"; };
+  }, [stage]);
 
   const handleFile = useCallback(async (file: File) => {
     setError(null);
@@ -75,7 +84,7 @@ export function ManuscriptStudio() {
 
   return (
     <section id="studio" className="mx-auto max-w-6xl px-6 py-16">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {stage === "idle" || stage === "parsing" ? (
           <motion.div
             key="upload"
@@ -121,11 +130,34 @@ export function ManuscriptStudio() {
         ) : (
           <motion.div
             key="ready"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid gap-8 lg:grid-cols-[1fr_360px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-[100] flex flex-col bg-background overflow-hidden"
           >
-            {/* Preview */}
+            {/* Header for fixed studio */}
+            <nav className="flex items-center justify-between border-b border-rule px-6 py-3 bg-card/50 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/logo_transparent_v4.png?v=4" 
+                  className="h-8 w-8 object-contain" 
+                  alt="KlaroScriptorX Logo" 
+                />
+                <div>
+                  <h1 className="text-sm font-semibold leading-none">Manuscript Studio</h1>
+                  <p className="mt-1 text-[10px] text-muted-foreground uppercase tracking-wider">KlaroScriptorX Professional</p>
+                </div>
+              </div>
+              <button 
+                onClick={reset}
+                className="rounded-full bg-accent/10 px-4 py-1.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors"
+              >
+                Exit Studio
+              </button>
+            </nav>
+
+            <div className="flex-1 overflow-hidden grid lg:grid-cols-[1fr_360px]">
+              {/* Preview Scrollable */}
+              <div className="overflow-y-auto bg-muted/30 p-8 flex justify-center">
             <article 
               className={`paper-surface rounded-xl px-12 py-14 transition-all ${
                 hasBorders ? "border-[12px] border-double border-accent/10" : ""
@@ -245,9 +277,10 @@ export function ManuscriptStudio() {
               )}
               </div>
             </article>
+            </div>
 
             {/* Side panel */}
-            <aside className="space-y-6">
+            <aside className="border-l border-rule bg-card overflow-y-auto p-6 space-y-6">
               <div className="rounded-xl border border-rule bg-card p-5">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground">Source</p>
                 <p className="mt-1 truncate font-medium">{fileName}</p>
@@ -373,7 +406,8 @@ export function ManuscriptStudio() {
                 </button>
               </div>
             </aside>
-          </motion.div>
+          </div>
+        </motion.div>
         )}
       </AnimatePresence>
     </section>

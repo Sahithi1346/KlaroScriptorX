@@ -1,8 +1,8 @@
-# AutoScriptorX 📝
+# KlaroScriptorX 📝
 
-**AutoScriptorX** is a premium, AI-powered manuscript processing studio designed for researchers and academics. It transforms raw documents into professionally formatted manuscripts ready for publication in major journals like IEEE, Springer, and APA.
+**KlaroScriptorX** is a premium, AI-powered manuscript processing studio designed for researchers and academics. It transforms raw documents into professionally formatted manuscripts ready for publication in major journals like IEEE, Springer, and APA.
 
-![AutoScriptorX Preview](https://images.unsplash.com/photo-1456324504439-39765bca0c71?auto=format&fit=crop&q=80&w=2070)
+![KlaroScriptorX Preview](https://images.unsplash.com/photo-1456324504439-39765bca0c71?auto=format&fit=crop&q=80&w=2070)
 
 ## ✨ Features
 
@@ -31,8 +31,8 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Sahithi1346/AutoScriptorX.git
-   cd AutoScriptorX
+   git clone https://github.com/Sahithi1346/KlaroScriptorX.git
+   cd KlaroScriptorX
    ```
 
 2. Install dependencies:

@@ -9,8 +9,12 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   vite: {
     server: {
-      port: 3000,
-      strictPort: false,
+      port: 3002,
+      strictPort: true,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Security-Policy": "frame-ancestors *",
+      },
     }
   }
 });
