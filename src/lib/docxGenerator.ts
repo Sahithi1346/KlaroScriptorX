@@ -22,7 +22,13 @@ import type { TemplateSpec } from "./templates";
 const cellBorder = { style: BorderStyle.SINGLE, size: 4, color: "888888" };
 const cellBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
 
-function blockToParagraphs(block: Block, font: string, size: number, headingSize: number, lineSpacing: number): (Paragraph | Table)[] {
+function blockToParagraphs(
+  block: Block,
+  font: string,
+  size: number,
+  headingSize: number,
+  lineSpacing: number,
+): (Paragraph | Table)[] {
   const spacing = { line: lineSpacing, after: 120 };
 
   switch (block.type) {
@@ -42,7 +48,7 @@ function blockToParagraphs(block: Block, font: string, size: number, headingSize
             bullet: block.ordered ? undefined : { level: 0 },
             numbering: block.ordered ? { reference: "numbers", level: 0 } : undefined,
             children: [new TextRun({ text: it, font, size })],
-          })
+          }),
       );
     case "table": {
       const cols = Math.max(1, block.rows[0]?.length || 1);
@@ -62,20 +68,19 @@ function blockToParagraphs(block: Block, font: string, size: number, headingSize
                       shading: ri === 0 ? { fill: "EEEEEE", type: ShadingType.CLEAR } : undefined,
                       children: [
                         new Paragraph({
-                          children: [
-                            new TextRun({ text: cell, font, size, bold: ri === 0 }),
-                          ],
+                          children: [new TextRun({ text: cell, font, size, bold: ri === 0 })],
                         }),
                       ],
-                    })
+                    }),
                 ),
-              })
+              }),
           ),
         }),
         new Paragraph({ children: [new TextRun({ text: "" })] }),
       ];
     }
     case "figure": {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const children: any[] = [];
       if (block.src) {
         try {
@@ -84,15 +89,24 @@ function blockToParagraphs(block: Block, font: string, size: number, headingSize
             children.push(
               new ImageRun({
                 data: Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0)),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 transformation: { width: 450, height: 300 },
-              } as any)
+              } as any),
             );
           }
         } catch (e) {
           console.error("Failed to embed image in DOCX", e);
         }
       }
-      children.push(new TextRun({ text: block.caption || "[Figure]", italics: true, font, size, break: children.length > 0 ? 1 : 0 }));
+      children.push(
+        new TextRun({
+          text: block.caption || "[Figure]",
+          italics: true,
+          font,
+          size,
+          break: children.length > 0 ? 1 : 0,
+        }),
+      );
       return [
         new Paragraph({
           alignment: AlignmentType.CENTER,
@@ -104,7 +118,12 @@ function blockToParagraphs(block: Block, font: string, size: number, headingSize
     case "heading":
       return [
         new Paragraph({
-          heading: block.level === 1 ? HeadingLevel.HEADING_1 : block.level === 2 ? HeadingLevel.HEADING_2 : HeadingLevel.HEADING_3,
+          heading:
+            block.level === 1
+              ? HeadingLevel.HEADING_1
+              : block.level === 2
+                ? HeadingLevel.HEADING_2
+                : HeadingLevel.HEADING_3,
           spacing: { before: 240, after: 120 },
           children: [new TextRun({ text: block.text, bold: true, font, size: headingSize })],
         }),
@@ -122,7 +141,7 @@ function blockToParagraphs(block: Block, font: string, size: number, headingSize
 export async function generateDocx(
   parsed: ParsedDoc,
   spec: TemplateSpec,
-  options: { fontFamily: string; fontSize: string; hasBorders: boolean }
+  options: { fontFamily: string; fontSize: string; hasBorders: boolean },
 ): Promise<Blob> {
   const font = options.fontFamily || spec.font;
   const bodySizePt = parseInt(options.fontSize);
@@ -135,7 +154,7 @@ export async function generateDocx(
     spacing: { after: 200 },
     children: [new TextRun({ text: parsed.title, bold: true, font, size: titleSize })],
   });
-  
+
   const authorPara = new Paragraph({
     alignment: AlignmentType.CENTER,
     spacing: { after: 100 },
@@ -147,7 +166,12 @@ export async function generateDocx(
         alignment: AlignmentType.CENTER,
         spacing: { after: 240 },
         children: [
-          new TextRun({ text: parsed.affiliations.join(" • "), italics: true, font, size: bodySize - 2 }),
+          new TextRun({
+            text: parsed.affiliations.join(" • "),
+            italics: true,
+            font,
+            size: bodySize - 2,
+          }),
         ],
       })
     : null;
@@ -161,9 +185,7 @@ export async function generateDocx(
         new Paragraph({
           alignment: AlignmentType.JUSTIFIED,
           spacing: { line: spec.lineSpacing, after: 120 },
-          children: [
-            new TextRun({ text: parsed.abstract, italics: true, font, size: bodySize }),
-          ],
+          children: [new TextRun({ text: parsed.abstract, italics: true, font, size: bodySize })],
         }),
       ]
     : [];
@@ -185,7 +207,7 @@ export async function generateDocx(
         heading: HeadingLevel.HEADING_1,
         spacing: { before: 240, after: 120 },
         children: [new TextRun({ text: section.heading, bold: true, font, size: headingSize })],
-      })
+      }),
     );
     for (const block of section.blocks) {
       bodyChildren.push(...blockToParagraphs(block, font, bodySize, headingSize, spec.lineSpacing));
@@ -210,7 +232,7 @@ export async function generateDocx(
                   size: bodySize,
                 }),
               ],
-            })
+            }),
         ),
       ]
     : [];
@@ -228,6 +250,7 @@ export async function generateDocx(
           levels: [
             {
               level: 0,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               format: "decimal" as any,
               text: "%1.",
               alignment: AlignmentType.LEFT,
@@ -250,12 +273,33 @@ export async function generateDocx(
             },
             borders: options.hasBorders
               ? {
-                  pageBorderTop: { style: BorderStyle.DOUBLE, size: 12, color: "444444", space: 24 },
-                  pageBorderBottom: { style: BorderStyle.DOUBLE, size: 12, color: "444444", space: 24 },
-                  pageBorderLeft: { style: BorderStyle.DOUBLE, size: 12, color: "444444", space: 24 },
-                  pageBorderRight: { style: BorderStyle.DOUBLE, size: 12, color: "444444", space: 24 },
+                  pageBorderTop: {
+                    style: BorderStyle.DOUBLE,
+                    size: 12,
+                    color: "444444",
+                    space: 24,
+                  },
+                  pageBorderBottom: {
+                    style: BorderStyle.DOUBLE,
+                    size: 12,
+                    color: "444444",
+                    space: 24,
+                  },
+                  pageBorderLeft: {
+                    style: BorderStyle.DOUBLE,
+                    size: 12,
+                    color: "444444",
+                    space: 24,
+                  },
+                  pageBorderRight: {
+                    style: BorderStyle.DOUBLE,
+                    size: 12,
+                    color: "444444",
+                    space: 24,
+                  },
                 }
               : undefined,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
           column: spec.columns === 2 ? { count: 2, space: 432, equalWidth: true } : undefined,
         },

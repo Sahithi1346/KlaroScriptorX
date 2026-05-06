@@ -5,7 +5,7 @@
 
 ## ✨ Features
 
-- **Instant Manuscript Studio**: Upload a DOCX and see it transformed into a live academic preview.
+- **KlaroScriptor Studio**: Intelligent manuscript preview and formatting dashboard.
 - **Dynamic Formatting**:
   - **Font Control**: Choose from a curated list of academic fonts (Times New Roman, Arial, Inter, etc.).
   - **Fluid Scaling**: Adjust font sizes (10pt - 16pt) with real-time preview updates.
@@ -29,12 +29,14 @@
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/Sahithi1346/KlaroScriptorX.git
    cd KlaroScriptorX
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```

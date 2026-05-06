@@ -33,10 +33,10 @@ function Index() {
     <main className="min-h-screen">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-3">
-          <img 
-            src="/logo_transparent_v4.png?v=4" 
-            className="h-10 w-10 object-contain" 
-            alt="KlaroScriptorX Logo" 
+          <img
+            src="/logo_transparent_v4.png?v=4"
+            className="h-10 w-10 object-contain"
+            alt="KlaroScriptorX Logo"
           />
           <span className="font-display text-xl font-semibold">KlaroScriptorX</span>
         </div>
@@ -50,11 +50,12 @@ function Index() {
           Manuscript intelligence
         </p>
         <h1 className="font-display text-5xl font-semibold leading-[1.05] text-balance md:text-7xl">
-          From rough draft to <em className="text-accent not-italic">publication-ready</em> in one upload.
+          From rough draft to <em className="text-accent not-italic">publication-ready</em> in one
+          upload.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-          KlaroScriptorX reads unstructured DOCX manuscripts, identifies every section, table, figure, and reference,
-          then formats them to your chosen journal or conference template.
+          KlaroScriptorX reads unstructured DOCX manuscripts, identifies every section, table,
+          figure, and reference, then formats them to your chosen journal or conference template.
         </p>
       </header>
 
@@ -79,13 +80,15 @@ function Index() {
               d: "Generate a clean .docx for further editing and a print-ready .pdf with proper headers and pagination.",
             },
           ].map((f) => (
-            <motion.div 
-              key={f.n} 
+            <motion.div
+              key={f.n}
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="group cursor-default rounded-xl border border-rule bg-card p-6 shadow-sm transition-colors hover:border-accent/30 hover:bg-accent/[0.02]"
             >
-              <p className="font-mono text-xs text-accent transition-transform group-hover:scale-110 origin-left">{f.n}</p>
+              <p className="font-mono text-xs text-accent transition-transform group-hover:scale-110 origin-left">
+                {f.n}
+              </p>
               <h3 className="mt-2 font-display text-xl">{f.t}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{f.d}</p>
             </motion.div>

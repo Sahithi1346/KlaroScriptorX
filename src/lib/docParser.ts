@@ -23,7 +23,7 @@ export interface ParsedDoc {
 
 const REF_HEADINGS = /^(references|bibliography|works cited)$/i;
 const ABSTRACT_HEADING = /^abstract$/i;
-const KEYWORDS_HEADING = /^(keywords|key words|index terms)\s*[:\-]?/i;
+const KEYWORDS_HEADING = /^(keywords|key words|index terms)\s*[:-]?/i;
 
 export async function parseDocx(file: File): Promise<ParsedDoc> {
   const arrayBuffer = await file.arrayBuffer();
@@ -35,7 +35,7 @@ export async function parseDocx(file: File): Promise<ParsedDoc> {
         "p[style-name='Subtitle'] => p.subtitle:fresh",
         "p[style-name='Author'] => p.author:fresh",
       ],
-    }
+    },
   );
 
   const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
@@ -70,15 +70,61 @@ export async function parseDocx(file: File): Promise<ParsedDoc> {
     if (!text && tag !== "table" && tag !== "img") continue;
 
     // Title detection: first H1 or first non-empty paragraph in long-ish format
-    if (!title && (tag === "h1" || (mode === "front" && tag === "p" && text.length < 200 && i < 3))) {
+    if (
+      !title &&
+      (tag === "h1" || (mode === "front" && tag === "p" && text.length < 200 && i < 3))
+    ) {
       title = text;
       continue;
     }
 
-    // Author detection (early paragraphs with email/comma patterns)
-    if (mode === "front" && tag === "p" && !abstract) {
-      if (/@/.test(text) || /^[A-Z][a-z]+ [A-Z]/.test(text) && text.length < 250 && authors.length < 3) {
-        const parts = text.split(/[,;]| and /i).map((s) => s.trim()).filter(Boolean);
+    // Improved front matter and section detection
+    if (mode === "front" && tag === "p") {
+      // Handle cases where multiple labels are merged into one paragraph
+      // e.g. "Author: John Doe Affiliation: Uni X Abstract: This paper..."
+      const mergedPattern =
+        /(author(?:s)?|affiliation(?:s)?|abstract|keyword(?:s)?|index terms)\s*:/gi;
+      if (mergedPattern.test(text)) {
+        const matches = Array.from(text.matchAll(mergedPattern));
+        for (let m = 0; m < matches.length; m++) {
+          const start = matches[m].index!;
+          const end = m + 1 < matches.length ? matches[m + 1].index! : text.length;
+          const label = matches[m][1].toLowerCase();
+          const value = text.slice(start + matches[m][0].length, end).trim();
+
+          if (label.startsWith("author")) {
+            authors.push(
+              ...value
+                .split(/[,;]| and /i)
+                .map((s) => s.trim())
+                .filter(Boolean),
+            );
+          } else if (label.startsWith("affiliation")) {
+            affiliations.push(value);
+          } else if (label.startsWith("abstract")) {
+            abstract = value;
+            mode = "abstract";
+          } else if (label.startsWith("keyword") || label === "index terms") {
+            keywords.push(
+              ...value
+                .split(/[,;]/)
+                .map((s) => s.trim())
+                .filter(Boolean),
+            );
+          }
+        }
+        if (authors.length || affiliations.length || abstract) continue;
+      }
+
+      // Fallback heuristics for unlabeled content
+      if (
+        /@/.test(text) ||
+        (/^[A-Z][a-z]+ [A-Z]/.test(text) && text.length < 250 && authors.length < 3)
+      ) {
+        const parts = text
+          .split(/[,;]| and /i)
+          .map((s) => s.trim())
+          .filter(Boolean);
         if (parts.length && /[A-Z][a-z]+/.test(parts[0])) {
           authors.push(...parts.filter((p) => /^[A-Z]/.test(p) && p.length < 80));
           continue;
@@ -97,7 +143,11 @@ export async function parseDocx(file: File): Promise<ParsedDoc> {
     }
     if (mode === "abstract" && tag === "p") {
       if (KEYWORDS_HEADING.test(text)) {
-        keywords = text.replace(KEYWORDS_HEADING, "").split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+        keywords = text
+          .replace(KEYWORDS_HEADING, "")
+          .split(/[,;]/)
+          .map((s) => s.trim())
+          .filter(Boolean);
         mode = "body";
         continue;
       }
@@ -114,14 +164,16 @@ export async function parseDocx(file: File): Promise<ParsedDoc> {
       if (tag === "p" || tag === "li") {
         references.push(text);
       } else if (tag === "ol" || tag === "ul") {
-        Array.from(el.querySelectorAll("li")).forEach((li) => references.push((li.textContent || "").trim()));
+        Array.from(el.querySelectorAll("li")).forEach((li) =>
+          references.push((li.textContent || "").trim()),
+        );
       }
       continue;
     }
 
     // Headings
     if (tag === "h1" || tag === "h2" || tag === "h3") {
-      const level = (parseInt(tag[1]) as 1 | 2 | 3);
+      const level = parseInt(tag[1]) as 1 | 2 | 3;
       currentSection = { heading: text, blocks: [] };
       sections.push(currentSection);
       mode = "body";
@@ -131,7 +183,7 @@ export async function parseDocx(file: File): Promise<ParsedDoc> {
     // Tables
     if (tag === "table") {
       const rows: string[][] = Array.from(el.querySelectorAll("tr")).map((tr) =>
-        Array.from(tr.querySelectorAll("th,td")).map((c) => (c.textContent || "").trim())
+        Array.from(tr.querySelectorAll("th,td")).map((c) => (c.textContent || "").trim()),
       );
       tables.push(rows);
       pushBlock({ type: "table", rows });
@@ -141,7 +193,9 @@ export async function parseDocx(file: File): Promise<ParsedDoc> {
 
     // Lists
     if (tag === "ul" || tag === "ol") {
-      const items = Array.from(el.querySelectorAll("li")).map((li) => (li.textContent || "").trim());
+      const items = Array.from(el.querySelectorAll("li")).map((li) =>
+        (li.textContent || "").trim(),
+      );
       pushBlock({ type: "list", ordered: tag === "ol", items });
       continue;
     }
