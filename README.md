@@ -2,7 +2,6 @@
 
 **KlaroScriptorX** is a premium, AI-powered manuscript processing studio designed for researchers and academics. It transforms raw documents into professionally formatted manuscripts ready for publication in major journals like IEEE, Springer, and APA.
 
-![KlaroScriptorX Preview](https://images.unsplash.com/photo-1456324504439-39765bca0c71?auto=format&fit=crop&q=80&w=2070)
 
 ## ✨ Features
 
